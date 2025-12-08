@@ -2,12 +2,16 @@ import streamlit as st
 import pandas as pd
 import joblib
 from pathlib import Path
+from xgboost import Booster
+import numpy as np
+
+
 
 # ---------------------------
 # CONFIG
 # ---------------------------
 DATA_PATH = "D:\labmetrix\India_household_price\india_housing_prices.csv"
-MODEL_PATH = "xgboost_model.pkl"
+MODEL_PATH = "xgboost_model.json"
 VECTORIZER_PATH = "dict_vectorizer.pkl"
 CURRENT_YEAR = 2025
 GROWTH_RATE = 0.08       # 8% annual growth
@@ -18,16 +22,23 @@ YEARS_FWD = 5
 # ---------------------------
 @st.cache_resource
 def load_model_and_vectorizer():
-    model = joblib.load(MODEL_PATH)
+     # Load XGBoost JSON model
+    booster = Booster()
+    booster.load_model(MODEL_PATH)
+
     dv = joblib.load(VECTORIZER_PATH)
     return model, dv
 
+# LOAD DATASET
+# ---------------------------
 @st.cache_data
 def load_dataset():
-    if Path(DATA_PATH).exists():
-        df = pd.read_csv(DATA_PATH)
-        return df
-    return None
+    path = Path(DATA_PATH)
+    if path.exists():
+        return pd.read_csv(path)
+    else:
+        st.warning("Dataset not found at: " + DATA_PATH)
+        return None
 
 model, dv = load_model_and_vectorizer()
 df = load_dataset()
