@@ -27,7 +27,7 @@ def load_model_and_vectorizer():
     booster.load_model(MODEL_PATH)
 
     dv = joblib.load(VECTORIZER_PATH)
-    return model, dv
+    return booster, dv
 
 # LOAD DATASET
 # ---------------------------
